@@ -29,6 +29,63 @@
 
 ;;; Code:
 
+(defgroup meow-tree-sitter nil "Tree-sitter powered motions for Meow."
+  :group 'tools)
+
+;; From https://github.com/meain/evil-textobj-tree-sitter/blob/a19ab9d89a00f4a04420f9b5d61b66f04fea5261/evil-textobj-tree-sitter-core.el#L78
+(defcustom meow-tree-sitter-major-mode-language-alist
+  '((c++-mode . "cpp")
+    (c++-ts-mode . "cpp")
+    (c-mode . "c")
+    (c-ts-mode . "c")
+    (csharp-mode . "csharp")
+    (csharp-ts-mode . "csharp")
+    (elixir-mode . "elixir")
+    (elixir-ts-mode . "elixir")
+    (elm-mode . "elm")
+    (elm-ts-mode . "elm")
+    (ess-r-mode . "r")
+    (go-mode . "go")
+    (go-ts-mode . "go")
+    (haskell-mode . "haskell")
+    (haskell-ts-mode . "haskell")
+    (html-mode . "html")
+    (html-ts-mode . "html")
+    (java-mode . "java")
+    (java-ts-mode . "java")
+    (javascript-mode . "javascript")
+    (javascript-ts-mode . "javascript")
+    (js-mode . "javascript")
+    (js-ts-mode . "js")
+    (js2-mode . "javascript")
+    (js3-mode . "javascript")
+    (julia-mode . "julia")
+    (julia-ts-mode . "julia")
+    (matlab-mode . "matlab")
+    (php-mode . "php")
+    (php-ts-mode . "php")
+    (prisma-mode . "prisma")
+    (prisma-ts-mode . "prisma")
+    (python-mode . "python")
+    (python-ts-mode . "python")
+    (rjsx-mode . "javascript")
+    (ruby-mode . "ruby")
+    (ruby-ts-mode . "ruby")
+    (rust-mode . "rust")
+    (rust-ts-mode . "rust")
+    (rustic-mode . "rust")
+    (sh-mode . "bash")
+    (bash-ts-mode . "sh")
+    (shell-script-mode . "bash")
+    (typescript-mode . "typescript")
+    (typescript-ts-mode . "typescript")
+    (verilog-mode . "verilog")
+    (zig-mode . "zig"))
+  "Alist that maps major modes to tree-sitter language names."
+  :group 'meow-tree-sitter
+  :type '(alist :key-type symbol
+                :value-type string))
+
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
               (target (treesit-parent-until
