@@ -86,6 +86,26 @@
   :type '(alist :key-type symbol
                 :value-type string))
 
+(defcustom meow-tree-sitter-queries-dir
+  (expand-file-name "queries"
+                    (file-name-directory
+                     (cond
+                      (load-in-progress load-file-name)
+                      (buffer-file-name))))
+  "Directory where tree-sitter queries are located. Defaults to the 'queries'
+  subdirectory where `meow-tree-sitter' is located."
+  :group 'meow-tree-sitter
+  :type 'directory)
+
+(defun meow-tree-sitter--get-query (mode)
+  "Returns tree-sitter query for MODE from `meow-tree-sitter-queries-dir'."
+  (let* ((lang (cdr (assq mode meow-tree-sitter-major-mode-language-alist)))
+         (file (expand-file-name (concat lang "/textobjects.scm")
+                                 meow-tree-sitter-queries-dir)))
+    (with-temp-buffer
+      (insert-file-contents file)
+      (buffer-string))))
+
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
               (target (treesit-parent-until
