@@ -109,6 +109,7 @@
       (insert-file-contents file)
       (buffer-string))))
 
+;; TODO: the QUERY parameter doesn't do anything
 (defun meow-tree-sitter--get-nodes (&optional query)
   "Returns tree-sitter nodes for QUERY. If QUERY is nil, uses the default query
  and current major mode.
@@ -123,6 +124,12 @@ cell of the bounds of the object."
                      (cons (treesit-node-start node)
                            (treesit-node-end node)))))
             nodes)))
+
+(defun meow-tree-sitter--get-nodes-of-type (types)
+  "Returns tree-sitter nodes that are of a type contained in the list TYPES."
+  (cl-remove-if-not (lambda (node)
+                      (memq (car node) types))
+                    (meow-tree-sitter--get-nodes)))
 
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
