@@ -108,6 +108,21 @@
       (insert-file-contents file)
       (buffer-string))))
 
+(defun meow-tree-sitter--get-nodes (&optional query)
+  "Returns tree-sitter nodes for QUERY. If QUERY is nil, uses the default query
+ and current major mode.
+
+Return value is an alist where the CAR is the query name and the CDR is a cons
+cell of the bounds of the object."
+  (let* ((q (or query (meow-tree-sitter--get-query major-mode)))
+         (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
+    (mapcar (lambda (result)
+              (cl-destructuring-bind (name . node) result
+               (cons name
+                     (cons (treesit-node-start node)
+                           (treesit-node-end node)))))
+            nodes)))
+
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
               (target (treesit-parent-until
