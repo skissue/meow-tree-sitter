@@ -29,6 +29,8 @@
 
 ;;; Code:
 
+(require 'treesit)
+
 (defgroup meow-tree-sitter nil "Tree-sitter powered motions for Meow."
   :group 'tools)
 
