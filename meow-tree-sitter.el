@@ -1,11 +1,12 @@
 ;;; meow-tree-sitter.el --- Tree-sitter powered motions for Meow -*- lexical-binding: t -*-
 
-;; Author: skissue
-;; Maintainer: skissue
-;; Version: 0.1.0
-;; Package-Requires: ((emacs "29") (meow "1.4.5"))
-;; Homepage: https://github.com/skissue/meow-tree-sitter
+;; Copyright (C) 2024 Ad
 
+;; Author: skissue <144847922+skissue@users.noreply.github.com>
+;; Version: 0.1.0
+;; Package-Requires: ((emacs "29") (meow))
+;; URL: https://github.com/skissue/meow-tree-sitter
+;; Keywords: convenience, files, languages, tools
 
 ;; This file is not part of GNU Emacs
 
