@@ -23,7 +23,7 @@ To get up and running fast 💨, simply call ~meow-tree-sitter-register-defaults
 + C :: class
 + / :: comment
 
-To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~.
+To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~. The second argument should be the "type" of object to select, which is the first part of the name of a capture; see the [[file:queries/][queries]] for the default capture names.
 #+begin_src elisp
 (meow-tree-sitter-register-thing ?f "function")
 (meow-tree-sitter-register-thing ?C "class")
