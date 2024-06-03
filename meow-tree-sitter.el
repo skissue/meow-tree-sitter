@@ -177,7 +177,7 @@ captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
      (meow-tree-sitter-select outer query))))
 
 ;;;###autoload
-(defun meow-tree-sitter-register ()
+(defun meow-tree-sitter-register-defaults ()
   "Register `meow-tree-sitter''s motions with `meow-char-thing-table' and
 `meow-thing-register' using default keybinds."
   (meow-tree-sitter-register-thing ?f "function")
