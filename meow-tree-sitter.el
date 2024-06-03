@@ -140,8 +140,8 @@ cell of the bounds of the object."
          (nodes-within (cl-remove-if-not
                         (lambda (node)
                           (cl-destructuring-bind (start . finish) (cdr node)
-                            (and (< start beg)
-                                 (> finish end))))
+                            (and (<= start beg)
+                                 (>= finish end))))
                         nodes)))
     (sort nodes-within (lambda (a b)
                          (< (cadr a) (cadr b))))))
