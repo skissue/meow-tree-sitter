@@ -77,15 +77,29 @@ name of the mode without the suffix."
                    meow-tree-sitter-major-mode-language-alist))
         mode-name)))
 
-;; TODO: support inherited queries
-(defun meow-tree-sitter--get-query (mode)
-  "Returns tree-sitter query for MODE from `meow-tree-sitter-queries-dir'."
-  (let* ((lang (meow-tree-sitter--get-lang-name mode))
-         (file (expand-file-name (concat lang "/textobjects.scm")
-                                 meow-tree-sitter-queries-dir)))
+(defun meow-tree-sitter--get-query (lang)
+  "Returns tree-sitter query for LANG from `meow-tree-sitter-queries-dir'."
+  (let ((file (expand-file-name (concat lang "/textobjects.scm")
+                                meow-tree-sitter-queries-dir))
+        (queries))
     (with-temp-buffer
       (insert-file-contents file)
-      (buffer-string))))
+      (setq queries (buffer-string)))
+    (string-join (cons queries (meow-tree-sitter--parse-inherited queries))
+                 "\n")))
+
+(defun meow-tree-sitter--parse-inherited (queries)
+  "Parse all inherited queries in the read QUERIES text and
+ return them."
+  (when-let* (((string-match (rx line-start
+                                 "; inherits: "
+                                 (group (+ (any ?, alpha ?_)))
+                                 line-end)
+                             queries))
+              (langs (match-string 1 queries)))
+    (mapcar (lambda (lang)
+              (meow-tree-sitter--get-query lang))
+            (string-split langs ","))))
 
 ;; TODO: the QUERY parameter doesn't do anything
 (defun meow-tree-sitter--get-nodes (&optional query)
@@ -94,7 +108,8 @@ name of the mode without the suffix."
 
 Return value is an alist where the CAR is the query name and the CDR is a cons
 cell of the bounds of the object."
-  (let* ((q (or query (meow-tree-sitter--get-query major-mode)))
+  (let* ((q (or query (meow-tree-sitter--get-query
+                       (meow-tree-sitter--get-lang-name major-mode))))
          (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
     (mapcar (lambda (result)
               (cl-destructuring-bind (name . node) result
