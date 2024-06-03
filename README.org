@@ -3,20 +3,21 @@
 
 =meow-tree-sitter= is a package that integrates the ~treesit~ library in Emacs 29+ 🌳 with [[https://github.com/meow-edit/meow][Meow]]'s motions 🐱. Lots of functionality is ported from [[https://github.com/meain/evil-textobj-tree-sitter][evil-textobj-tree-sitter]].
 
-* Status
+* Status 📆
 This project is still in its early days, so expect bugs 🐛 and rapid development 💨! However, it should be in a usable state; issues and pull requests are appreciated ❤️.
 
-* Requirements
-Currently, the package only supports the native ~treesit~ library in Emacs 29+. Personally, I have no interest in supporting [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][elisp-tree-sitter]] since I don't use it, but pull requests are welcome 🙃.
+* Requirements ⚠️
 + Emacs 29+ ✍️ with ~treesit~ support 🌳
 + [[https://github.com/meow-edit/meow][Meow]] 🐱
 
-* Installation
+Currently, the package only supports the native ~treesit~ library in Emacs 29+. Personally, I have no interest in supporting [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][elisp-tree-sitter]] since I don't use it, but pull requests are welcome 🙃.
+
+* Installation 💾
 Installation should be as simple as any other package: clone the repository, add the location to ~load-path~, and then ~(require 'meow-tree-sitter)~.
 
 If you have trouble with the =queries/= directory, then customize the value of ~meow-tree-sitter-queries-dir~.
 
-* Configuration
+* Configuration 🔧
 To get up and running fast 💨, simply call ~meow-tree-sitter-register-defaults~ to set up the default keybinds. Currently, this adds the following keys to Meow:
 + f :: function
 + C :: class
@@ -26,11 +27,11 @@ To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~.
 #+begin_src elisp
 (meow-tree-sitter-register-thing ?f "function")
 (meow-tree-sitter-register-thing ?C "class")
-(meow-tree-sitter-register-thing ?/ "comment"))
+(meow-tree-sitter-register-thing ?/ "comment")
 #+end_src
 
 ** Custom Queries
-Custom queries must use the ~treesit~ query syntax, which is described [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern-Matching.html][here]]; this is also accessible within Emacs by evaluating ~(info "(elisp)Pattern Matching")~. To support both "outer" and "inner" bounds of things in Meow, each query should have two captures: "TYPE.inside" and "TYPE.around".
+Custom queries must use the ~treesit~ query syntax, which is described [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern-Matching.html][here]] or within Emacs by evaluating ~(info "(elisp)Pattern Matching")~. To support both "outer" and "inner" bounds of things in Meow, each query should have two captures: =TYPE.inside= and =TYPE.around= where =TYPE= is the "name" of the thing (the second parameter to ~meow-tree-sitter-register-thing~).
 
 To register a custom query, pass an alist to ~meow-tree-sitter-register-thing~ that maps language strings to queries. The query can be of any form that ~treesit-query-capture~ accepts.
 #+begin_src elisp
@@ -42,5 +43,5 @@ To register a custom query, pass an alist to ~meow-tree-sitter-register-thing~ t
                 body: (_) @function.inside) @function.around")))
 #+end_src
 
-* License
+* License 📜
 Code in this repository is licensed under the GPLv3. The queries are taken from from the [[https://github.com/helix-editor/helix/tree/master/runtime/queries][helix]] project, which is licensed under the Mozilla Public License 2.0.
