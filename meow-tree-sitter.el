@@ -131,6 +131,20 @@ cell of the bounds of the object."
                       (memq (car node) types))
                     (meow-tree-sitter--get-nodes)))
 
+(defun meow-tree-sitter--get-nodes-around (types beg end)
+  "Returns tree-sitter nodes that are of a type contained in the list TYPES that
+  encompass the region between BEG and END. List is sorted by closeness of the
+  node to the region."
+  (let* ((nodes (meow-tree-sitter--get-nodes-of-type types))
+         (nodes-within (cl-remove-if-not
+                        (lambda (node)
+                          (cl-destructuring-bind (start . finish) (cdr node)
+                            (and (< start beg)
+                                 (> finish end))))
+                        nodes)))
+    (sort nodes-within (lambda (a b)
+                         (< (cadr a) (cadr b))))))
+
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
               (target (treesit-parent-until
