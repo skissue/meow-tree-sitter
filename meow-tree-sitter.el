@@ -91,15 +91,16 @@ name of the mode without the suffix."
 (defun meow-tree-sitter--parse-inherited (queries)
   "Parse all inherited queries in the read QUERIES text and
  return them."
-  (when-let* (((string-match (rx line-start
-                                 "; inherits: "
-                                 (group (+ (any ?, alpha ?_)))
-                                 line-end)
-                             queries))
-              (langs (match-string 1 queries)))
-    (mapcar (lambda (lang)
-              (meow-tree-sitter--get-query lang))
-            (string-split langs ","))))
+  (save-match-data
+    (when-let* (((string-match (rx line-start
+                                   "; inherits: "
+                                   (group (+ (any ?, alpha ?_)))
+                                   line-end)
+                               queries))
+                (langs (match-string 1 queries)))
+      (mapcar (lambda (lang)
+                (meow-tree-sitter--get-query lang))
+              (string-split langs ",")))))
 
 ;; TODO: the QUERY parameter doesn't do anything
 (defun meow-tree-sitter--get-nodes (&optional query)
