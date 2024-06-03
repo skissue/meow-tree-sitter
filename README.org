@@ -15,19 +15,25 @@ Currently, the package only supports the native ~treesit~ library in Emacs 29+. 
 * Installation 💾
 Installation should be as simple as any other package: clone the repository, add the location to ~load-path~, and then ~(require 'meow-tree-sitter)~.
 
-If you have trouble with the =queries/= directory, then customize the value of ~meow-tree-sitter-queries-dir~.
+If you have trouble with the =queries/= directory (or want to use a custom queries folder), then customize the value of ~meow-tree-sitter-queries-dir~.
+
+* Quickstart 💨
+#+begin_src elisp
+(add-to-list 'load-path "/path/to/meow-tree-sitter")
+(require 'meow-tree-sitter)
+(meow-tree-sitter-register-defaults)
+#+end_src
 
 * Configuration 🔧
-To get up and running fast 💨, simply call ~meow-tree-sitter-register-defaults~ to set up the default keybinds. Currently, this adds the following keys to Meow:
+~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow:
 + f :: function
 + C :: class
 + / :: comment
 
 To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~. The second argument should be the "type" of object to select, which is the first part of the name of a capture; see the [[file:queries/][queries]] for the default capture names.
 #+begin_src elisp
-(meow-tree-sitter-register-thing ?f "function")
-(meow-tree-sitter-register-thing ?C "class")
-(meow-tree-sitter-register-thing ?/ "comment")
+(meow-tree-sitter-register-thing ?F "function")
+(meow-tree-sitter-register-thing ?P "parameter")
 #+end_src
 
 ** Custom Queries
