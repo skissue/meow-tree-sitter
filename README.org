@@ -24,7 +24,7 @@ If you have trouble with the =queries/= directory (or want to use a custom queri
 (meow-tree-sitter-register-defaults)
 #+end_src
 
-Tree-sitter powered motions should now be accessible through Meow's "thing" functionality, namely ~meow-bounds-of-thing~ and ~meow-inner-of-thing~ (bound to =.= and =,= by default).
+Tree-sitter powered motions should now be accessible through Meow's "thing" functionality, namely ~meow-bounds-of-thing~ and ~meow-inner-of-thing~ (bound to period and comma by default).
 
 * Configuration 🔧
 ~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow:
