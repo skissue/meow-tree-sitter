@@ -102,15 +102,16 @@ name of the mode without the suffix."
                 (meow-tree-sitter--get-query lang))
               (string-split langs ",")))))
 
-;; TODO: the QUERY parameter doesn't do anything
 (defun meow-tree-sitter--get-nodes (&optional query)
-  "Returns tree-sitter nodes for QUERY. If QUERY is nil, uses the default query
- and current major mode.
+  "Returns tree-sitter nodes for the query in the alist QUERY where
+the CAR is the current major mode. If QUERY is nil, uses the
+default query for the current major mode.
 
-Return value is an alist where the CAR is the query name and the CDR is a cons
-cell of the bounds of the object."
-  (let* ((q (or query (meow-tree-sitter--get-query
-                       (meow-tree-sitter--get-lang-name major-mode))))
+Return value is an alist where the CAR is the query name and the
+CDR is a cons cell of the bounds of the object."
+  (let* ((q (or (cdr (assq major-mode query))
+                (meow-tree-sitter--get-query
+                 (meow-tree-sitter--get-lang-name major-mode))))
          (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
     (mapcar (lambda (result)
               (cl-destructuring-bind (name . node) result
@@ -119,17 +120,21 @@ cell of the bounds of the object."
                            (treesit-node-end node)))))
             nodes)))
 
-(defun meow-tree-sitter--get-nodes-of-type (types)
-  "Returns tree-sitter nodes that are of a type contained in the list TYPES."
+(defun meow-tree-sitter--get-nodes-of-type (types &optional query)
+  "Returns tree-sitter nodes that are of a type contained in the
+list TYPES. QUERY, if non-nil, is an alist specifying a custom
+set of queries to use."
   (cl-remove-if-not (lambda (node)
                       (memq (car node) types))
-                    (meow-tree-sitter--get-nodes)))
+                    (meow-tree-sitter--get-nodes query)))
 
-(defun meow-tree-sitter--get-nodes-around (types beg end)
-  "Returns tree-sitter nodes that are of a type contained in the list TYPES that
-  encompass the region between BEG and END. List is sorted by closeness of the
-  node to the region."
-  (let* ((nodes (meow-tree-sitter--get-nodes-of-type types))
+(defun meow-tree-sitter--get-nodes-around (types beg end &optional query)
+  "Returns tree-sitter nodes that are of a type contained in the
+list TYPES that encompass the region between BEG and END. List is
+sorted by closeness of the node to the region. QUERY, if non-nil,
+is an alist defining a custom set of queries to be used per
+major mode."
+  (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
          (nodes-within (cl-remove-if-not
                         (lambda (node)
                           (cl-destructuring-bind (start . finish) (cdr node)
@@ -139,28 +144,37 @@ cell of the bounds of the object."
     (sort nodes-within (lambda (a b)
                          (< (cadr a) (cadr b))))))
 
-(defmacro meow-tree-sitter-select (type)
-  "Macro that evaluates to a lambda that selects the TYPE around region if
-  applicable, else around point. For use with `meow-thing-register'."
+(defmacro meow-tree-sitter-select (type &optional query)
+  "Macro that evaluates to a lambda that selects the TYPE around
+region if applicable, else around point. QUERY, if provided, is
+an alist for a custom query to use. For use with
+`meow-thing-register'."
   `(lambda ()
      (let ((nodes (if (use-region-p)
                       (meow-tree-sitter--get-nodes-around
-                       (list ,type) (region-beginning) (region-end))
+                       (list ,type) (region-beginning) (region-end) query)
                     (meow-tree-sitter--get-nodes-around
-                     (list ,type) (point) (point)))))
+                     (list ,type) (point) (point) query))))
        (cdar nodes))))
 
-(defun meow-tree-sitter-register-thing (key type)
+(defun meow-tree-sitter-register-thing (key type &optional query)
   "Convenience function to add the tree-sitter query TYPE to KEY in
-  `meow-char-thing-table' and register it with `meow-thing-register'. TYPE
-  should be the name of a type as a string, e.g. \"function\"; \"TYPE.inside\"
-  and \"TYPE.around\" will then be registered appropriately."
+`meow-char-thing-table' and register it with
+`meow-thing-register'. TYPE should be the name of a type as a
+string, e.g. \"function\"; \"TYPE.inside\" and \"TYPE.around\"
+will then be registered appropriately.
+
+If QUERY is non-nil, it should be an alist mapping major modes to
+a custom query to use. Each query should have two captures, one
+for \"TYPE.inside\" and one for \"TYPE.around\"."
   (let* ((sym (intern type))
          (inner (intern (concat type ".inside")))
          (outer (intern (concat type ".around"))))
     (cl-pushnew (cons key sym) meow-char-thing-table)
     (meow-thing-register
-     sym (meow-tree-sitter-select inner) (meow-tree-sitter-select outer))))
+     sym
+     (meow-tree-sitter-select inner query)
+     (meow-tree-sitter-select outer query))))
 
 ;;;###autoload
 (defun meow-tree-sitter-register ()
