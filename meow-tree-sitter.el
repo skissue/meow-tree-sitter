@@ -157,6 +157,7 @@ an alist for a custom query to use. For use with
                      (list ,type) (point) (point) query))))
        (cdar nodes))))
 
+;;;###autoload
 (defun meow-tree-sitter-register-thing (key type &optional query)
   "Convenience function to add the tree-sitter query TYPE to KEY in
 `meow-char-thing-table' and register it with
