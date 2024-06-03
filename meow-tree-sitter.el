@@ -145,6 +145,31 @@ cell of the bounds of the object."
     (sort nodes-within (lambda (a b)
                          (< (cadr a) (cadr b))))))
 
+(defun meow-tree-sitter-register-thing (key type)
+  "Convenience function to add the tree-sitter query TYPE to KEY in
+  `meow-char-thing-table' and register it with `meow-thing-register'. TYPE
+  should be the name of a type as a string, e.g. \"function\"; \"TYPE.inside\"
+  and \"TYPE.around\" will then be registered appropriately."
+  (let* ((sym (intern type))
+         (inner (intern (concat type ".inside")))
+         (outer (intern (concat type ".around"))))
+    (cl-pushnew (cons key sym) meow-char-thing-table)
+    (meow-thing-register sym
+                         (lambda ()
+                           (let ((nodes (if (use-region-p)
+                                            (meow-tree-sitter--get-nodes-around
+                                             (list inner) (region-beginning) (region-end))
+                                          (meow-tree-sitter--get-nodes-around
+                                           (list inner) (point) (point)))))
+                             (cdar nodes)))
+                         (lambda ()
+                           (let ((nodes (if (use-region-p)
+                                            (meow-tree-sitter--get-nodes-around
+                                             (list outer) (region-beginning) (region-end))
+                                          (meow-tree-sitter--get-nodes-around
+                                           (list outer) (point) (point)))))
+                             (cdar nodes))))))
+
 (defun meow-tree-sitter-function-at-point ()
   (when-let* ((node-at-point (treesit-node-at (point)))
               (target (treesit-parent-until
