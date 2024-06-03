@@ -104,14 +104,14 @@ name of the mode without the suffix."
 
 (defun meow-tree-sitter--get-nodes (&optional query)
   "Returns tree-sitter nodes for the query in the alist QUERY where
-the CAR is the current major mode. If QUERY is nil, uses the
+the CAR is the current language. If QUERY is nil, uses the
 default query for the current major mode.
 
 Return value is an alist where the CAR is the query name and the
 CDR is a cons cell of the bounds of the object."
-  (let* ((q (or (cdr (assq major-mode query))
-                (meow-tree-sitter--get-query
-                 (meow-tree-sitter--get-lang-name major-mode))))
+  (let* ((lang (meow-tree-sitter--get-lang-name major-mode))
+         (q (or (cdr (assoc lang query))
+                (meow-tree-sitter--get-query lang)))
          (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
     (mapcar (lambda (result)
               (cl-destructuring-bind (name . node) result
@@ -132,8 +132,7 @@ set of queries to use."
   "Returns tree-sitter nodes that are of a type contained in the
 list TYPES that encompass the region between BEG and END. List is
 sorted by closeness of the node to the region. QUERY, if non-nil,
-is an alist defining a custom set of queries to be used per
-major mode."
+is an alist defining a custom set of queries to be used."
   (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
          (nodes-within (cl-remove-if-not
                         (lambda (node)
@@ -164,9 +163,9 @@ an alist for a custom query to use. For use with
 string, e.g. \"function\"; \"TYPE.inside\" and \"TYPE.around\"
 will then be registered appropriately.
 
-If QUERY is non-nil, it should be an alist mapping major modes to
-a custom query to use. Each query should have two captures, one
-for \"TYPE.inside\" and one for \"TYPE.around\"."
+If QUERY is non-nil, it should be an alist mapping language
+strings to a custom query to use. Each query should have two
+captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
   (let* ((sym (intern type))
          (inner (intern (concat type ".inside")))
          (outer (intern (concat type ".around"))))
