@@ -169,35 +169,13 @@ cell of the bounds of the object."
     (meow-thing-register
      sym (meow-tree-sitter-select inner) (meow-tree-sitter-select outer))))
 
-(defun meow-tree-sitter-function-at-point ()
-  (when-let* ((node-at-point (treesit-node-at (point)))
-              (target (treesit-parent-until
-                       node-at-point
-                       (lambda (n)
-                         (string= (treesit-node-type n)
-                                  "function_definition"))))
-              (start (treesit-node-start target))
-              (end (treesit-node-end target)))
-    (cons start end)))
-
-(defun meow-tree-sitter-function-at-point-inner ()
-  (when-let* ((node-at-point (treesit-node-at (point)))
-              (func (treesit-parent-until
-                     node-at-point
-                     (lambda (n)
-                       (string= (treesit-node-type n)
-                                "function_definition"))))
-              (body (treesit-node-child-by-field-name func "body"))
-              (start (treesit-node-start body))
-              (end (treesit-node-end body)))
-    (cons start end)))
-
 ;;;###autoload
 (defun meow-tree-sitter-register ()
   "Register `meow-tree-sitter''s motions with `meow-char-thing-table' and
 `meow-thing-register' using default keybinds."
-  (cl-pushnew '(?f . function) meow-char-thing-table)
-  (meow-thing-register 'function #'meow-tree-sitter-function-at-point-inner #'meow-tree-sitter-function-at-point))
+  (meow-tree-sitter-register-thing ?f "function")
+  (meow-tree-sitter-register-thing ?C "class")
+  (meow-tree-sitter-register-thing ?/ "comment"))
 
 (provide 'meow-tree-sitter)
 
