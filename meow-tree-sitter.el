@@ -96,11 +96,17 @@ name of the mode without the suffix."
                                 meow-tree-sitter-queries-dir))
         (custom-query (cdr (assoc lang meow-tree-sitter-extra-queries)))
         (queries))
-    (if custom-query
-        (setq queries custom-query)
+    (cond
+     (custom-query
+      (setq queries custom-query))
+     ((not (file-exists-p file))
+      (user-error "No default query found for the current buffer!
+Check `meow-tree-sitter-queries-dir' or try customizing
+`meow-tree-sitter-extra-queries'."))
+     (t
       (with-temp-buffer
         (insert-file-contents file)
-        (setq queries (buffer-string))))
+        (setq queries (buffer-string)))))
     ;; Could be a sexp custom query
     (if (stringp queries)
         (string-join (cons queries (meow-tree-sitter--parse-inherited queries))
