@@ -67,6 +67,18 @@ by default."
   :group 'meow-tree-sitter
   :type 'directory)
 
+(defcustom meow-tree-sitter-extra-queries nil
+  "Extra default queries to use. Should be an alist mapping
+ language names to a query to use. Entries in this list will
+override the queries from `meow-tree-sitter-queries-dir' if it
+also exists there. Entries should contain captures for all
+motions intended to be used (see queries in
+`meow-tree-sitter-queries-dir' for examples)."
+  :group 'meow-tree-sitter
+  :type '(alist :key-type string
+                :value-type (restricted-sexp
+                             :match-alternatives (treesit-query-p))))
+
 (defun meow-tree-sitter--get-lang-name (mode)
   "Get the language name for major-mode MODE. Removes a \"-ts-mode\"
 or \"-mode\" suffix and then consults
@@ -82,10 +94,13 @@ name of the mode without the suffix."
   "Returns tree-sitter query for LANG from `meow-tree-sitter-queries-dir'."
   (let ((file (expand-file-name (concat lang "/textobjects.scm")
                                 meow-tree-sitter-queries-dir))
+        (custom-query (cdr (assoc lang meow-tree-sitter-extra-queries)))
         (queries))
-    (with-temp-buffer
-      (insert-file-contents file)
-      (setq queries (buffer-string)))
+    (if custom-query
+        (setq queries custom-query)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (setq queries (buffer-string))))
     (string-join (cons queries (meow-tree-sitter--parse-inherited queries))
                  "\n")))
 
