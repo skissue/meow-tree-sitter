@@ -101,8 +101,11 @@ name of the mode without the suffix."
       (with-temp-buffer
         (insert-file-contents file)
         (setq queries (buffer-string))))
-    (string-join (cons queries (meow-tree-sitter--parse-inherited queries))
-                 "\n")))
+    ;; Could be a sexp custom query
+    (if (stringp queries)
+        (string-join (cons queries (meow-tree-sitter--parse-inherited queries))
+                     "\n")
+      queries)))
 
 (defun meow-tree-sitter--parse-inherited (queries)
   "Parse all inherited queries in the read QUERIES text and
