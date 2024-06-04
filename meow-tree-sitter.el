@@ -39,21 +39,21 @@
 
 ;; From https://github.com/meain/evil-textobj-tree-sitter/blob/a19ab9d89a00f4a04420f9b5d61b66f04fea5261/evil-textobj-tree-sitter-core.el#L78
 (defcustom meow-tree-sitter-major-mode-language-alist
-  '((c++ . "cpp")
-    (ess-r . "r")
-    (js . "javascript")
-    (js2 . "javascript")
-    (js3 . "javascript")
-    (rjsx . "javascript")
-    (rustic . "rust")
-    (sh . "bash")
-    (shell-script . "bash"))
+  '(("c++" . "cpp")
+    ("ess-r" . "r")
+    ("js" . "javascript")
+    ("js2" . "javascript")
+    ("js3" . "javascript")
+    ("rjsx" . "javascript")
+    ("rustic" . "rust")
+    ("sh" . "bash")
+    ("shell-script" . "bash"))
   "Alist that maps major mode names (without the trailing
-\"-ts-mode\" or \"-mode\" suffix) to tree-sitter language names.
-Only needed for languages where the major mode name isn't correct
-by default."
+\"-ts-mode\" or \"-mode\" suffix) as strings to tree-sitter
+language names. Only needed for languages where the major mode
+name isn't correct by default."
   :group 'meow-tree-sitter
-  :type '(alist :key-type symbol
+  :type '(alist :key-type string
                 :value-type string))
 
 (defcustom meow-tree-sitter-queries-dir
@@ -86,8 +86,8 @@ or \"-mode\" suffix and then consults
 name of the mode without the suffix."
   (let ((mode-name (string-trim-right (symbol-name mode)
                                       (rx (? "-ts") "-mode"))))
-    (or (cdr (assq (intern mode-name)
-                   meow-tree-sitter-major-mode-language-alist))
+    (or (cdr (assoc mode-name
+                    meow-tree-sitter-major-mode-language-alist))
         mode-name)))
 
 (defun meow-tree-sitter--get-query (lang)
