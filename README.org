@@ -52,4 +52,4 @@ To register a custom query, pass an alist to ~meow-tree-sitter-register-thing~ t
 #+end_src
 
 * License 📜
-Code in this repository is licensed under the GPLv3. The queries are taken from from the [[https://github.com/helix-editor/helix/tree/master/runtime/queries][helix]] project, which is licensed under the Mozilla Public License 2.0.
+Code in this repository is licensed under the GPLv3. The queries are taken from the [[https://github.com/helix-editor/helix/tree/master/runtime/queries][helix]] project, which is licensed under the Mozilla Public License 2.0.
