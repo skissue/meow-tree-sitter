@@ -156,7 +156,7 @@ set of queries to use."
 (defun meow-tree-sitter--get-nodes-around (types beg end &optional query)
   "Returns tree-sitter nodes that are of a type contained in the
 list TYPES that encompass the region between BEG and END. List is
-sorted by closeness of the node to the region. QUERY, if non-nil,
+sorted by \"closeness\" of the node to the region. QUERY, if non-nil,
 is an alist defining a custom set of queries to be used."
   (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
          (nodes-within (cl-remove-if-not
@@ -165,8 +165,11 @@ is an alist defining a custom set of queries to be used."
                             (and (<= start beg)
                                  (>= finish end))))
                         nodes)))
+    ;; Since nodes are a tree, ones that start earlier must be further from the
+    ;; region than ones that start later, since every node must start before the
+    ;; region starts.
     (sort nodes-within (lambda (a b)
-                         (< (cadr a) (cadr b))))))
+                         (> (cadr a) (cadr b))))))
 
 (defmacro meow-tree-sitter-select (type &optional query)
   "Macro that evaluates to a lambda that selects the TYPE around
