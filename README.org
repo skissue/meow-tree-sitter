@@ -28,8 +28,11 @@ Tree-sitter powered motions should now be accessible through Meow's "thing" func
 
 * Configuration 🔧
 ~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow:
++ a :: class
++ e :: entry
 + f :: function
-+ C :: class
++ t :: test
++ , :: parameter
 + / :: comment
 
 To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~. The second argument should be the "type" of object to select, which is the first part of the name of a capture; see the [[file:queries/][queries]] for the default capture names.
