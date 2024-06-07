@@ -208,9 +208,14 @@ captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
 (defun meow-tree-sitter-register-defaults ()
   "Register `meow-tree-sitter''s motions with `meow-char-thing-table' and
 `meow-thing-register' using default keybinds."
-  (meow-tree-sitter-register-thing ?f "function")
-  (meow-tree-sitter-register-thing ?C "class")
-  (meow-tree-sitter-register-thing ?/ "comment"))
+  (dolist (bind '((?a . "class")
+                  (?e . "entry")
+                  (?f . "function")
+                  (?t . "test")
+                  (?, . "parameter")
+                  (?/ . "comment")))
+    (meow-tree-sitter-register-thing (car bind) (cdr bind))))
+
 
 (provide 'meow-tree-sitter)
 
