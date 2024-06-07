@@ -92,7 +92,7 @@ name of the mode without the suffix."
 
 (defun meow-tree-sitter--get-query (lang)
   "Returns tree-sitter query for LANG from `meow-tree-sitter-queries-dir'."
-  (let ((file (expand-file-name (concat lang "/textobjects.scm")
+  (let ((file (expand-file-name (concat lang ".scm")
                                 meow-tree-sitter-queries-dir))
         (custom-query (cdr (assoc lang meow-tree-sitter-extra-queries)))
         (queries))
