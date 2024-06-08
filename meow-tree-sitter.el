@@ -58,9 +58,10 @@ name isn't correct by default."
 
 (defcustom meow-tree-sitter-can-jump-forward t
   "Whether to jump to the next match if there is no matching node
-around the current point/region."
+around the current point/region. Can be set to an integer to only
+jump if the closest node is less than that many characters away."
   :group 'meow-tree-sitter
-  :type 'boolean)
+  :type '(choice boolean integer))
 
 (defcustom meow-tree-sitter-queries-dir
   (expand-file-name "queries"
@@ -203,7 +204,12 @@ an alist for a custom query to use. For use with
        (cond
         (around
          (cdar around))
-        (meow-tree-sitter-can-jump-forward
+        ((and (integerp meow-tree-sitter-can-jump-forward)
+              (< (- (cadar after) (point))
+                 meow-tree-sitter-can-jump-forward))
+         (cdar after))
+        ((and (booleanp meow-tree-sitter-can-jump-forward)
+              meow-tree-sitter-can-jump-forward)
          (cdar after))))))
 
 ;;;###autoload
