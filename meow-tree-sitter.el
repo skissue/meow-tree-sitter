@@ -4,7 +4,7 @@
 
 ;; Author: skissue <144847922+skissue@users.noreply.github.com>
 ;; Version: 0.1.0
-;; Package-Requires: ((emacs "29") (meow))
+;; Package-Requires: ((emacs "29.1") (meow "1.2.0"))
 ;; URL: https://github.com/skissue/meow-tree-sitter
 ;; Keywords: convenience, files, languages, tools
 
@@ -31,7 +31,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'meow)
+(require 'meow-thing)
 (require 'treesit)
 
 (defgroup meow-tree-sitter nil "Tree-sitter powered motions for Meow."
