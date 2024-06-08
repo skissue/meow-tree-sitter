@@ -48,18 +48,18 @@
     ("rustic" . "rust")
     ("sh" . "bash")
     ("shell-script" . "bash"))
-  "Alist that maps major mode names (without the trailing
-\"-ts-mode\" or \"-mode\" suffix) as strings to tree-sitter
-language names. Only needed for languages where the major mode
-name isn't correct by default."
+  "Alist mapping major mode names to tree-sitter language names.
+Major modes are specified as strings without the trailing
+\"-ts-mode\" or \"-mode\". Only needed for languages where the
+major mode name isn't correct by default."
   :group 'meow-tree-sitter
   :type '(alist :key-type string
                 :value-type string))
 
 (defcustom meow-tree-sitter-can-jump-forward t
-  "Whether to jump to the next match if there is no matching node
-around the current point/region. Can be set to an integer to only
-jump if the closest node is less than that many characters away."
+  "Jump to the next match if there is no matching encompassing node.
+Can be set to an integer to only jump if the closest node is
+less than that many characters away."
   :group 'meow-tree-sitter
   :type '(choice boolean integer))
 
@@ -75,25 +75,27 @@ Useful for queries that match multiple things."
                      (cond
                       (load-in-progress load-file-name)
                       (buffer-file-name))))
-  "Directory where tree-sitter queries are located. Defaults to the 'queries'
-  subdirectory where `meow-tree-sitter' is located."
+  "Directory where tree-sitter queries are located.
+Defaults to the 'queries' subdirectory where `meow-tree-sitter'
+is located."
   :group 'meow-tree-sitter
   :type 'directory)
 
 (defcustom meow-tree-sitter-extra-queries nil
-  "Extra default queries to use. Should be an alist mapping
- language names to a query to use. Entries in this list will
-override the queries from `meow-tree-sitter-queries-dir' if it
-also exists there. Entries should contain captures for all
-motions intended to be used (see queries in
-`meow-tree-sitter-queries-dir' for examples)."
+  "Alist of extra queries to use by default.
+Should be an alist mapping language names to a query to use.
+Entries in this list will override the queries from
+`meow-tree-sitter-queries-dir' if they also exists there. Entries
+should contain captures for all motions intended to be used (see
+queries in `meow-tree-sitter-queries-dir' for examples)."
   :group 'meow-tree-sitter
   :type '(alist :key-type string
                 :value-type (restricted-sexp
                              :match-alternatives (treesit-query-p))))
 
 (defun meow-tree-sitter--get-lang-name (mode)
-  "Get the language name for major-mode MODE. Removes a \"-ts-mode\"
+  "Get the language name for major-mode MODE.
+Removes a \"-ts-mode\"
 or \"-mode\" suffix and then consults
 `meow-tree-sitter-major-mode-language-alist', defaulting to the
 name of the mode without the suffix."
@@ -104,7 +106,9 @@ name of the mode without the suffix."
         mode-name)))
 
 (defun meow-tree-sitter--get-query (lang)
-  "Returns tree-sitter query for LANG from `meow-tree-sitter-queries-dir'."
+  "Return tree-sitter query for LANG.
+Queries from `meow-tree-sitter-extra-queries' have priority;
+otherwise return queries from `meow-tree-sitter-queries-dir'."
   (let ((file (expand-file-name (concat lang ".scm")
                                 meow-tree-sitter-queries-dir))
         (custom-query (cdr (assoc lang meow-tree-sitter-extra-queries)))
@@ -113,9 +117,11 @@ name of the mode without the suffix."
      (custom-query
       (setq queries custom-query))
      ((not (file-exists-p file))
-      (user-error "No default query found for the current buffer!
-Check `meow-tree-sitter-queries-dir' or try customizing
-`meow-tree-sitter-extra-queries'."))
+      (user-error
+       (concat "No default query found for \"%s\"! "
+               "Check `meow-tree-sitter-queries-dir' or try customizing "
+               "`meow-tree-sitter-extra-queries'")
+       lang))
      (t
       (with-temp-buffer
         (insert-file-contents file)
@@ -127,8 +133,7 @@ Check `meow-tree-sitter-queries-dir' or try customizing
       queries)))
 
 (defun meow-tree-sitter--parse-inherited (queries)
-  "Parse all inherited queries in the read QUERIES text and
- return them."
+  "Parse and return all inherited queries in the read QUERIES text."
   (save-match-data
     (when-let* (((string-match (rx line-start
                                    "; inherits: "
@@ -141,9 +146,10 @@ Check `meow-tree-sitter-queries-dir' or try customizing
               (string-split langs ",")))))
 
 (defun meow-tree-sitter--get-nodes (&optional query)
-  "Returns tree-sitter nodes for the query in the alist QUERY where
-the CAR is the current language. If QUERY is nil, uses the
-default query for the current major mode.
+  "Return tree-sitter nodes for QUERY or the default query.
+If QUERY is non-nil, it should be an alist mapping language names
+to queries. If QUERY is nil, uses the default query for the
+current major mode.
 
 Return value is an alist where the CAR is the query name and the
 CDR is a cons cell of the bounds of the object."
@@ -159,23 +165,25 @@ CDR is a cons cell of the bounds of the object."
             nodes)))
 
 (defun meow-tree-sitter--get-nodes-of-type (types &optional query)
-  "Returns tree-sitter nodes that are of a type contained in the
-list TYPES. QUERY, if non-nil, is an alist specifying a custom
-set of queries to use."
+  "Return tree-sitter nodes that match a type from the list TYPES.
+QUERY, if non-nil, is an alist specifying a custom set of queries
+to use."
   (cl-remove-if-not (lambda (node)
                       (memq (car node) types))
                     (meow-tree-sitter--get-nodes query)))
 
 (defun meow-tree-sitter--get-nodes-around (types beg end &optional query)
-  "Returns tree-sitter nodes that are of a type contained in the
-list TYPES, segmented into two lists: nodes that encompass the
-region between BEG and END and nodes that are after BEG. If
-`meow-tree-sitter-can-expand' is non-nil, filter out nodes that
-are identical to the current region. Both lists are sorted by
-\"closeness\" of the node to the region. QUERY, if non-nil, is an
-alist defining a custom set of queries to be used. Return value
-is a cons cell where the CAR is the first group and the CDR is
-the second."
+  "Return tree-sitter nodes matching TYPES around BEG and END.
+The return value is a cons cell of two lists: nodes that
+encompass the region between BEG and END, and nodes that are
+after BEG. Both lists are sorted by \"closeness\" of the node to
+the region.
+
+If `meow-tree-sitter-can-expand' is non-nil, filter out nodes that
+are identical to the current region.
+
+QUERY, if non-nil, is an alist defining a custom set of queries
+to be used."
   (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
          (nodes-around)
          (nodes-after))
@@ -225,16 +233,18 @@ optional alist of custom queries to use."
 
 ;;;###autoload
 (defun meow-tree-sitter-register-thing (key types &optional query)
-  "Convenience function to add the tree-sitter query TYPE to KEY in
-`meow-char-thing-table' and register it with
-`meow-thing-register'. TYPES should be the name of a type as a
-string, e.g. \"function\", or a list of such types;
-\"TYPE.inside\" and \"TYPE.around\" will then be registered
-appropriately.
+  "Register a query for TYPES with KEY in Meow.
+Adds a query matching TYPES to `meow-char-thing-table' and
+registers it with `meow-thing-register'.
+
+TYPES should be the name of a type as a string, e.g.
+\"function\", or a list of such types; \"TYPE.inside\" and
+\"TYPE.around\" will then be registered appropriately.
 
 If QUERY is non-nil, it should be an alist mapping language
 strings to a custom query to use. Each query should have two
-captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
+captures, one for \"TYPE.inside\" and one for \"TYPE.around\".
+See this project's README for more details."
   (when (stringp types)
     (setq types (list types)))
   (let* ((sym (intern (string-join types "/")))
@@ -252,8 +262,7 @@ captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
 
 ;;;###autoload
 (defun meow-tree-sitter-register-defaults ()
-  "Register `meow-tree-sitter''s motions with `meow-char-thing-table' and
-`meow-thing-register' using default keybinds."
+  "Register default keybinds with Meow."
   (dolist (bind '((?a . "class")
                   (?e . "entry")
                   (?f . "function")
