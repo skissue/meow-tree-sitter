@@ -189,28 +189,28 @@ first group and the CDR is the second."
                         (< (cadr a) (cadr b))))
     (cons nodes-around nodes-after)))
 
-(defmacro meow-tree-sitter-select (type &optional query)
-  "Macro that evaluates to a lambda that selects the TYPE around
-region if applicable, else around point. QUERY, if provided, is
-an alist for a custom query to use. For use with
-`meow-thing-register'."
-  `(lambda ()
-     (cl-destructuring-bind (around . after)
-         (if (use-region-p)
-             (meow-tree-sitter--get-nodes-around
-              (list ,type) (region-beginning) (region-end) query)
-           (meow-tree-sitter--get-nodes-around
-            (list ,type) (point) (point) query))
-       (cond
-        (around
-         (cdar around))
-        ((and (integerp meow-tree-sitter-can-jump-forward)
-              (< (- (cadar after) (point))
-                 meow-tree-sitter-can-jump-forward))
-         (cdar after))
-        ((and (booleanp meow-tree-sitter-can-jump-forward)
-              meow-tree-sitter-can-jump-forward)
-         (cdar after))))))
+(defun meow-tree-sitter--select-thing (type &optional query)
+  "Return bounds of thing TYPE. Use the region if it is active,
+otherwise point. QUERY is an optional alist of custom queries to
+use."
+  (let ((start (point))
+        (end (point)))
+    (when (use-region-p)
+      (setq start (region-beginning)
+            end (region-end)))
+    (cl-destructuring-bind (around . after)
+        (meow-tree-sitter--get-nodes-around
+         (list type) start end query)
+      (cond
+       (around
+        (cdar around))
+       ((and (integerp meow-tree-sitter-can-jump-forward)
+             (< (- (cadar after) (point))
+                meow-tree-sitter-can-jump-forward))
+        (cdar after))
+       ((and (booleanp meow-tree-sitter-can-jump-forward)
+             meow-tree-sitter-can-jump-forward)
+        (cdar after))))))
 
 ;;;###autoload
 (defun meow-tree-sitter-register-thing (key type &optional query)
@@ -229,8 +229,8 @@ captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
     (cl-pushnew (cons key sym) meow-char-thing-table)
     (meow-thing-register
      sym
-     (meow-tree-sitter-select inner query)
-     (meow-tree-sitter-select outer query))))
+     (lambda () (meow-tree-sitter--select-thing inner query))
+     (lambda () (meow-tree-sitter--select-thing outer query)))))
 
 ;;;###autoload
 (defun meow-tree-sitter-register-defaults ()
