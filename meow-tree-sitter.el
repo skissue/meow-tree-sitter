@@ -189,10 +189,10 @@ first group and the CDR is the second."
                         (< (cadr a) (cadr b))))
     (cons nodes-around nodes-after)))
 
-(defun meow-tree-sitter--select-thing (type &optional query)
-  "Return bounds of thing TYPE. Use the region if it is active,
-otherwise point. QUERY is an optional alist of custom queries to
-use."
+(defun meow-tree-sitter--select-thing (types &optional query)
+  "Return bounds of innermost thing around region/point in TYPES.
+Use the region if it is active, otherwise point. QUERY is an
+optional alist of custom queries to use."
   (let ((start (point))
         (end (point)))
     (when (use-region-p)
@@ -200,7 +200,7 @@ use."
             end (region-end)))
     (cl-destructuring-bind (around . after)
         (meow-tree-sitter--get-nodes-around
-         (list type) start end query)
+         types start end query)
       (cond
        (around
         (cdar around))
@@ -213,19 +213,26 @@ use."
         (cdar after))))))
 
 ;;;###autoload
-(defun meow-tree-sitter-register-thing (key type &optional query)
+(defun meow-tree-sitter-register-thing (key types &optional query)
   "Convenience function to add the tree-sitter query TYPE to KEY in
 `meow-char-thing-table' and register it with
-`meow-thing-register'. TYPE should be the name of a type as a
-string, e.g. \"function\"; \"TYPE.inside\" and \"TYPE.around\"
-will then be registered appropriately.
+`meow-thing-register'. TYPES should be the name of a type as a
+string, e.g. \"function\", or a list of such types;
+\"TYPE.inside\" and \"TYPE.around\" will then be registered
+appropriately.
 
 If QUERY is non-nil, it should be an alist mapping language
 strings to a custom query to use. Each query should have two
 captures, one for \"TYPE.inside\" and one for \"TYPE.around\"."
-  (let* ((sym (intern type))
-         (inner (intern (concat type ".inside")))
-         (outer (intern (concat type ".around"))))
+  (when (stringp types)
+    (setq types (list types)))
+  (let* ((sym (intern (string-join types "/")))
+         (inner (mapcar (lambda (type)
+                          (intern (concat type ".inside")))
+                        types))
+         (outer (mapcar (lambda (type)
+                          (intern (concat type ".around")))
+                        types)))
     (cl-pushnew (cons key sym) meow-char-thing-table)
     (meow-thing-register
      sym
