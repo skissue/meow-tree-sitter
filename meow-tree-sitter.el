@@ -56,6 +56,12 @@ name isn't correct by default."
   :type '(alist :key-type string
                 :value-type string))
 
+(defcustom meow-tree-sitter-can-jump-forward t
+  "Whether to jump to the next match if there is no matching node
+around the current point/region."
+  :group 'meow-tree-sitter
+  :type 'boolean)
+
 (defcustom meow-tree-sitter-queries-dir
   (expand-file-name "queries"
                     (file-name-directory
@@ -155,21 +161,32 @@ set of queries to use."
 
 (defun meow-tree-sitter--get-nodes-around (types beg end &optional query)
   "Returns tree-sitter nodes that are of a type contained in the
-list TYPES that encompass the region between BEG and END. List is
-sorted by \"closeness\" of the node to the region. QUERY, if non-nil,
-is an alist defining a custom set of queries to be used."
+list TYPES, segmented into two lists: nodes that encompass the
+region between BEG and END and nodes that are after BEG. Both
+lists are sorted by \"closeness\" of the node to the region.
+QUERY, if non-nil, is an alist defining a custom set of queries
+to be used. Return value is a cons cell where the CAR is the
+first group and the CDR is the second."
   (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
-         (nodes-within (cl-remove-if-not
-                        (lambda (node)
-                          (cl-destructuring-bind (start . finish) (cdr node)
-                            (and (<= start beg)
-                                 (>= finish end))))
-                        nodes)))
+         (nodes-around)
+         (nodes-after))
+    (cl-loop for node in nodes
+             if (cl-destructuring-bind (start . finish) (cdr node)
+                  (and (<= start beg)
+                       (>= finish end)))
+             do (push node nodes-around)
+             else
+             if (cl-destructuring-bind (start . finish) (cdr node)
+                  (>= start beg))
+             do (push node nodes-after))
     ;; Since nodes are a tree, ones that start earlier must be further from the
     ;; region than ones that start later, since every node must start before the
     ;; region starts.
-    (sort nodes-within (lambda (a b)
-                         (> (cadr a) (cadr b))))))
+    (sort nodes-around (lambda (a b)
+                         (> (cadr a) (cadr b))))
+    (sort nodes-after (lambda (a b)
+                        (< (cadr a) (cadr b))))
+    (cons nodes-around nodes-after)))
 
 (defmacro meow-tree-sitter-select (type &optional query)
   "Macro that evaluates to a lambda that selects the TYPE around
@@ -177,12 +194,17 @@ region if applicable, else around point. QUERY, if provided, is
 an alist for a custom query to use. For use with
 `meow-thing-register'."
   `(lambda ()
-     (let ((nodes (if (use-region-p)
-                      (meow-tree-sitter--get-nodes-around
-                       (list ,type) (region-beginning) (region-end) query)
-                    (meow-tree-sitter--get-nodes-around
-                     (list ,type) (point) (point) query))))
-       (cdar nodes))))
+     (cl-destructuring-bind (around . after)
+         (if (use-region-p)
+             (meow-tree-sitter--get-nodes-around
+              (list ,type) (region-beginning) (region-end) query)
+           (meow-tree-sitter--get-nodes-around
+            (list ,type) (point) (point) query))
+       (cond
+        (around
+         (cdar around))
+        (meow-tree-sitter-can-jump-forward
+         (cdar after))))))
 
 ;;;###autoload
 (defun meow-tree-sitter-register-thing (key type &optional query)
