@@ -63,6 +63,12 @@ jump if the closest node is less than that many characters away."
   :group 'meow-tree-sitter
   :type '(choice boolean integer))
 
+(defcustom meow-tree-sitter-can-expand t
+  "Whether to allow expanding the current region if the same query is run.
+Useful for queries that match multiple things."
+  :group 'meow-tree-sitter
+  :type 'boolean)
+
 (defcustom meow-tree-sitter-queries-dir
   (expand-file-name "queries"
                     (file-name-directory
@@ -163,18 +169,23 @@ set of queries to use."
 (defun meow-tree-sitter--get-nodes-around (types beg end &optional query)
   "Returns tree-sitter nodes that are of a type contained in the
 list TYPES, segmented into two lists: nodes that encompass the
-region between BEG and END and nodes that are after BEG. Both
-lists are sorted by \"closeness\" of the node to the region.
-QUERY, if non-nil, is an alist defining a custom set of queries
-to be used. Return value is a cons cell where the CAR is the
-first group and the CDR is the second."
+region between BEG and END and nodes that are after BEG. If
+`meow-tree-sitter-can-expand' is non-nil, filter out nodes that
+are identical to the current region. Both lists are sorted by
+\"closeness\" of the node to the region. QUERY, if non-nil, is an
+alist defining a custom set of queries to be used. Return value
+is a cons cell where the CAR is the first group and the CDR is
+the second."
   (let* ((nodes (meow-tree-sitter--get-nodes-of-type types query))
          (nodes-around)
          (nodes-after))
     (cl-loop for node in nodes
              if (cl-destructuring-bind (start . finish) (cdr node)
-                  (and (<= start beg)
-                       (>= finish end)))
+                  (or (and (< start beg)
+                           (> finish end))
+                      (and (not meow-tree-sitter-can-expand)
+                           (= start beg)
+                           (= finish end))))
              do (push node nodes-around)
              else
              if (cl-destructuring-bind (start . finish) (cdr node)
