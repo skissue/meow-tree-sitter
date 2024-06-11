@@ -27,7 +27,7 @@ If you have trouble with the =queries/= directory (or want to use a custom queri
 Tree-sitter powered motions should now be accessible through Meow's "thing" functionality, namely ~meow-bounds-of-thing~ and ~meow-inner-of-thing~ (bound to period and comma by default).
 
 * Configuration 🔧
-~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow:
+~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow's "things":
 + a :: class
 + e :: entry
 + f :: function
@@ -35,10 +35,29 @@ Tree-sitter powered motions should now be accessible through Meow's "thing" func
 + , :: parameter
 + / :: comment
 
-To register custom keybinds 🔧, use ~meow-tree-sitter-register-thing~. The second argument should be the "type" of object to select, which is the first part of the name of a capture; see the [[file:queries/][queries]] for the default capture names.
+** Options
+Evaluate ~(customize-group 'meow-tree-sitter)~ in Emacs to see these options in the Customize interface.
++ ~meow-tree-sitter-can-expand~ ::
+  Whether repeating a motion will expand an existing selection. Mainly useful for queries for multiple types of nodes. Defaults to ~t~.
++ ~meow-tree-sitter-can-jump-forward~ ::
+  Whether to jump forward if there is no matching node within the current point/region. Can also be an integer to only jump forward if the next node is that many characters away. Defaults to ~t~.
++ ~meow-tree-sitter-extra-queries~ ::
+  An alist of extra queries to use by default. Entries in this list override the default set of queries. Useful to support languages that don't have queries by default. Defaults to ~nil~.
++ ~meow-tree-sitter-major-mode-language-alist~ ::
+  An alist mapping major mode name (sans =-ts-mode= and =-mode= suffix) to tree-sitter language names. Only needed for languages that don't match up by default.
++ ~meow-tree-sitter-queries-dir~ ::
+  The directory to look for the default set of queries that come with this package. Defaults to the =queries/= subdirectory where the package file is located.
+
+** Custom Keybinds ⌨️
+To register custom keybinds, use ~meow-tree-sitter-register-thing~. The second argument should be the "type" of object to select, which is the first part of the name of a capture; see the [[file:queries/][queries]] for the default capture names.
 #+begin_src elisp
 (meow-tree-sitter-register-thing ?F "function")
 (meow-tree-sitter-register-thing ?P "parameter")
+#+end_src
+
+Pass a list to query for multiple different types of objects.
+#+begin_src elisp
+(meow-tree-sitter-register-thing ?B '("function" "class"))
 #+end_src
 
 ** Custom Queries
