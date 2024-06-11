@@ -35,7 +35,7 @@ Tree-sitter powered motions should now be accessible through Meow's "thing" func
 + , :: parameter
 + / :: comment
 
-** Options
+** Options ⚙️
 Evaluate ~(customize-group 'meow-tree-sitter)~ in Emacs to see these options in the Customize interface.
 + ~meow-tree-sitter-can-expand~ ::
   Whether repeating a motion will expand an existing selection. Mainly useful for queries for multiple types of nodes. Defaults to ~t~.
@@ -60,7 +60,7 @@ Pass a list to query for multiple different types of objects.
 (meow-tree-sitter-register-thing ?B '("function" "class"))
 #+end_src
 
-** Custom Queries
+** Custom Queries ❓
 Custom queries must use the ~treesit~ query syntax, which is described [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Pattern-Matching.html][here]] or within Emacs by evaluating ~(info "(elisp)Pattern Matching")~. To support both "outer" and "inner" bounds of things in Meow, each query should have two captures: =TYPE.inside= and =TYPE.around= where =TYPE= is the "name" of the thing (the second parameter to ~meow-tree-sitter-register-thing~).
 
 To register a custom query, pass an alist to ~meow-tree-sitter-register-thing~ that maps language strings to queries. The query can be of any form that ~treesit-query-capture~ accepts.
