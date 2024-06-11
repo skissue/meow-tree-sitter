@@ -3,6 +3,22 @@
 
 =meow-tree-sitter= is a package that integrates the ~treesit~ library in Emacs 29+ 🌳 with [[https://github.com/meow-edit/meow][Meow]]'s motions 🐱. Lots of functionality is ported from [[https://github.com/meain/evil-textobj-tree-sitter][evil-textobj-tree-sitter]].
 
+* Contents
+:PROPERTIES:
+:TOC:      :include all :depth 3 :force (nothing) :ignore (this) :local (nothing)
+:END:
+:CONTENTS:
+- [[#status-][Status 📆]]
+- [[#requirements-️][Requirements ⚠️]]
+- [[#installation-][Installation 💾]]
+- [[#quickstart-][Quickstart 💨]]
+- [[#configuration-][Configuration 🔧]]
+  - [[#options-️][Options ⚙️]]
+  - [[#custom-keybinds-️][Custom Keybinds ⌨️]]
+  - [[#custom-queries-][Custom Queries ❓]]
+- [[#license-][License 📜]]
+:END:
+
 * Status 📆
 This project is still in its early days, so expect bugs 🐛 and rapid development 💨! However, it should be in a usable state; issues and pull requests are appreciated ❤️.
 
