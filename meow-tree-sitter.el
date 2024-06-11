@@ -26,9 +26,9 @@
 
 ;;; Commentary:
 
-;; 'meow-tree-sitter' is a package that integrates the treesit library in Emacs
+;; `meow-tree-sitter' is a package that integrates the treesit library in Emacs
 ;; 29+ 🌳 with Meow’s motions 🐱. Lots of functionality is ported from
-;; 'evil-textobj-tree-sitter'.
+;; `evil-textobj-tree-sitter'.
 
 ;; To get started, call `meow-tree-sitter-register-defaults' to add the default
 ;; keybinds to Meow's "thing" registry. They will now be accessible through
@@ -91,7 +91,7 @@ Useful for queries that match multiple things."
                       (load-in-progress load-file-name)
                       (buffer-file-name))))
   "Directory where tree-sitter queries are located.
-Defaults to the 'queries' subdirectory where `meow-tree-sitter'
+Defaults to the `queries' subdirectory where `meow-tree-sitter'
 is located."
   :group 'meow-tree-sitter
   :type 'directory)
