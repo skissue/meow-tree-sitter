@@ -36,12 +36,17 @@
 ;; \\[meow-beginning-of-thing] and \\[meow-end-of-thing].
 
 ;; Evaluate (customize-group 'meow-tree-sitter) to see customization options.
-;; Options are also detailed in the README.org file included with this package.
+;; Options are also detailed in the README.org file included in the project
+;; repository.
 
 ;; To register custom keybinds, call `meow-tree-sitter-register-thing' with a
 ;; key and type (or list of types). To register custom queries, pass the
-;; optional third argument. Persistent queries can be registered in
+;; optional third argument. Persistent custom queries can be registered in
 ;; `meow-tree-sitter-extra-queries'. See the README.org file for details.
+
+;; Queries in the `queries/' subdirectory were taken from the Helix project
+;; (https://github.com/helix-editor/helix/tree/master/runtime/queries). These
+;; queries are licensed under the GPL-compatible Mozilla Public License 2.0.
 
 ;;; Code:
 
