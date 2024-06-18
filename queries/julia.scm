@@ -40,7 +40,7 @@
 
 (_expression (macro_identifier
     (identifier) @_name
-    (#match? @_name "^(test|test_throws|test_logs|inferred|test_deprecated|test_warn|test_nowarn|test_broken|test_skip)$")
+    (#match "^(test|test_throws|test_logs|inferred|test_deprecated|test_warn|test_nowarn|test_broken|test_skip)$" @_name)
   )
   .
   (macro_argument_list) @test.inside) @test.around

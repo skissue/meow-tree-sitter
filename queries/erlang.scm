@@ -13,4 +13,4 @@
    name: (atom) @_name
    pattern: (arguments (_)? @parameter.inside)
    body: (_) @test.inside) @test.around
- (#match? @_name "_test$"))
+ (#match "_test$" @_name))

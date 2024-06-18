@@ -8,4 +8,4 @@
 ((function
    name: (identifier) @_name
    body: (function_body) @test.inside) @test.around
- (#match? @_name "_test$"))
+ (#match "_test$" @_name))

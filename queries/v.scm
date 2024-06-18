@@ -4,7 +4,7 @@
 ((function_declaration
    name: (identifier) @_name
    body: (block)? @test.inside) @test.around
- (#match? @_name "^test"))
+ (#match "^test" @_name))
 
 (function_literal
   body: (block)? @function.inside) @function.around

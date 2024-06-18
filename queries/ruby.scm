@@ -9,8 +9,8 @@
 (call
   receiver: (constant) @class_const
   method: (identifier) @class_method
-  (#match? @class_const "Class")
-  (#match? @class_method "new")
+  (#match "Class" @class_const)
+  (#match "new" @class_method)
   (do_block (_)+ @class.inside)) @class.around
   
 (module

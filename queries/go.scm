@@ -30,4 +30,4 @@
 ((function_declaration
    name: (identifier) @_name
    body: (block)? @test.inside) @test.around
- (#match? @_name "^Test"))
+ (#match "^Test" @_name))
