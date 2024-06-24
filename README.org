@@ -1,6 +1,9 @@
 #+title: meow-tree-sitter
 #+author: skissue
 
+[[https://melpa.org/#/meow-tree-sitter][file:https://melpa.org/packages/meow-tree-sitter-badge.svg]]
+[[https://stable.melpa.org/#/meow-tree-sitter][file:https://stable.melpa.org/packages/meow-tree-sitter-badge.svg]]
+
 =meow-tree-sitter= is a package that integrates the ~treesit~ library in Emacs 29+ 🌳 with [[https://github.com/meow-edit/meow][Meow]]'s motions 🐱. Lots of functionality is ported from [[https://github.com/meain/evil-textobj-tree-sitter][evil-textobj-tree-sitter]].
 
 * Contents
