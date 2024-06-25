@@ -32,9 +32,9 @@ This project is still in its early days, so expect bugs 🐛 and rapid developme
 Currently, the package only supports the native ~treesit~ library in Emacs 29+. Personally, I have no interest in supporting [[https://github.com/emacs-tree-sitter/elisp-tree-sitter][elisp-tree-sitter]] since I don't use it, but pull requests are welcome 🙃.
 
 * Installation 💾
-Installation should be as simple as any other package: clone the repository, add the location to ~load-path~, and then ~(require 'meow-tree-sitter)~.
+This package is [[https://melpa.org/#/meow-tree-sitter][now on MELPA]] 🎉. Installation should be as simple as any other package if MELPA is configured and set up. See [[https://melpa.org/#/getting-started][MELPA's "Getting started"]] if you do not have MELPA installed.
 
-If you have trouble with the =queries/= directory (or want to use a custom queries folder), then customize the value of ~meow-tree-sitter-queries-dir~.
+Alternatively, you can install the package manually as usual: clone the repository, add the location to ~load-path~, and then ~(require 'meow-tree-sitter)~. If you have trouble with the =queries/= directory (or want to use a custom queries folder), then customize the value of ~meow-tree-sitter-queries-dir~.
 
 * Quickstart 💨
 #+begin_src elisp
