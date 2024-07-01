@@ -48,9 +48,9 @@ Tree-sitter powered motions should now be accessible through Meow's "thing" func
 * Configuration 🔧
 ~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow's "things":
 + a :: class
-+ e :: entry
 + f :: function
 + t :: test
++ y :: entry
 + , :: parameter
 + / :: comment
 
