@@ -179,9 +179,9 @@ CDR is a cons cell of the bounds of the object."
          (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
     (mapcar (lambda (result)
               (cl-destructuring-bind (name . node) result
-               (cons name
-                     (cons (treesit-node-start node)
-                           (treesit-node-end node)))))
+                (cons name
+                      (cons (treesit-node-start node)
+                            (treesit-node-end node)))))
             nodes)))
 
 (defun meow-tree-sitter--get-nodes-of-type (types &optional query)
@@ -284,13 +284,12 @@ See this project's README for more details."
 (defun meow-tree-sitter-register-defaults ()
   "Register default keybinds with Meow."
   (dolist (bind '((?a . "class")
-                  (?e . "entry")
                   (?f . "function")
                   (?t . "test")
+                  (?y . "entry")
                   (?, . "parameter")
                   (?/ . "comment")))
     (meow-tree-sitter-register-thing (car bind) (cdr bind))))
-
 
 (provide 'meow-tree-sitter)
 
