@@ -282,13 +282,18 @@ See this project's README for more details."
 
 ;;;###autoload
 (defun meow-tree-sitter-register-defaults ()
-  "Register default keybinds with Meow."
+  "Register default keybinds with Meow.
+
+Note that this will override any existing things that use the default
+binds!"
   (dolist (bind '((?a . "class")
                   (?f . "function")
                   (?t . "test")
                   (?y . "entry")
                   (?, . "parameter")
                   (?/ . "comment")))
+    (setq meow-char-thing-table (assoc-delete-all (car bind)
+                                                  meow-char-thing-table))
     (meow-tree-sitter-register-thing (car bind) (cdr bind))))
 
 (provide 'meow-tree-sitter)
