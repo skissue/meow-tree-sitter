@@ -54,6 +54,8 @@ Tree-sitter powered motions should now be accessible through Meow's "thing" func
 + , :: parameter
 + / :: comment
 
+Note that if any of these keys are currently being used, they will be *overridden*.
+
 ** Options ⚙️
 Evaluate ~(customize-group 'meow-tree-sitter)~ in Emacs to see these options in the Customize interface.
 + ~meow-tree-sitter-can-expand~ ::
