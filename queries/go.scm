@@ -9,10 +9,22 @@
 
 ;; struct and interface declaration as class textobject?
 (type_declaration
-  (type_spec (type_identifier) (struct_type (field_declaration_list (_)?) @class.inside))) @class.around
+  (type_spec
+    type: (struct_type
+      (field_declaration_list) @class.inner))) @class.around
+
+(struct_type
+  (field_declaration_list) @class.inner) @class.around
 
 (type_declaration
-  (type_spec (type_identifier) (interface_type (method_spec)+ @class.inside))) @class.around
+  (type_spec
+   type: (struct_type
+          (field_declaration_list
+           (field_declaration
+            type: (function_type) @function.inner))))) @function.around
+ 
+ (type_parameter_list
+   ((_) @parameter.inside . ","? @parameter.around) @parameter.around)
 
 (type_parameter_list
   ((_) @parameter.inside . ","? @parameter.around) @parameter.around)
