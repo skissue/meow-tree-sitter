@@ -17,8 +17,12 @@
 (block_comment) @comment.inside
 (block_comment)+ @comment.around
 
-(macrocall_expression
-  (macro_identifier
-    (identifier) @_name
-    (#match "^(test|test_throws|test_logs|inferred|test_deprecated|test_warn|test_nowarn|test_broken|test_skip)$" @_name))
-  (macro_argument_list) @test.inside) @test.around
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_throws$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_logs$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^inferred$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_deprecated$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_warn$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_nowarn$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_broken$" @_name))
+((macrocall_expression (macro_identifier (identifier) @_name) (macro_argument_list) @test.inside) @test.around (#match "^test_skip$" @_name))
