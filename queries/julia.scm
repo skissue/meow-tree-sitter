@@ -10,7 +10,7 @@
 
 (primitive_definition (type_head)? @class.inside) @class.around
 
-(argument_list ((_) @parameter.inside . ","? @parameter.around))
+(argument_list ((_) @parameter.inside) @parameter.around)
 
 (line_comment) @comment.inside
 (line_comment)+ @comment.around
