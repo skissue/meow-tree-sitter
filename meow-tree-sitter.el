@@ -26,9 +26,13 @@
 
 ;;; Commentary:
 
-;; `meow-tree-sitter' is a package that integrates the treesit library in Emacs
-;; 29+ 🌳 with Meow’s motions 🐱. Lots of functionality is ported from
+;; `meow-tree-sitter' is a package that integrates the tree-sitter library 🌳
+;; with Meow’s motions 🐱. Lots of functionality is ported from
 ;; `evil-textobj-tree-sitter'.
+
+;; By default this uses the `elisp-tree-sitter' library if that is available,
+;; otherwise it uses the built-in functionality in Emacs 29+. If neither is
+;; available, an error will be raised.
 
 ;; To get started, call `meow-tree-sitter-register-defaults' to add the default
 ;; keybinds to Meow's "thing" registry. They will now be accessible through
@@ -52,7 +56,6 @@
 
 (require 'cl-lib)
 (require 'meow-thing)
-(require 'treesit)
 
 (defgroup meow-tree-sitter nil "Tree-sitter powered motions for Meow."
   :group 'tools)
@@ -73,8 +76,9 @@ Major modes are specified as strings without the trailing
 \"-ts-mode\" or \"-mode\". Only needed for languages where the
 major mode name isn't correct by default."
   :group 'meow-tree-sitter
-  :type '(alist :key-type string
-                :value-type string))
+  :type '(alist
+          :key-type string
+          :value-type string))
 
 (defcustom meow-tree-sitter-can-jump-forward t
   "Jump to the next match if there is no matching encompassing node.
@@ -101,6 +105,27 @@ is located."
   :group 'meow-tree-sitter
   :type 'directory)
 
+(defcustom meow-tree-sitter-backend (if (fboundp 'tree-sitter-mode)
+                                        'tree-sitter
+                                      'treesit)
+  "Tree-sitter library to use.
+Default to `elisp-tree-sitter' if available even over built-in `treesit'."
+  :group 'meow-tree-sitter
+  :type 'symbol)
+
+;; Pull in the appropriate library based on the chosen backend, and set
+;; implementation functions appropriately. This will throw an error
+;; if a `tree-sitter' implementation isn't available!
+(require meow-tree-sitter-backend)
+(defvar meow-tree-sitter--get-nodes-impl
+  (pcase meow-tree-sitter-backend
+    ('treesit #'meow-tree-sitter--get-nodes-native)
+    ('tree-sitter #'meow-tree-sitter--get-nodes-tsc)))
+(defvar meow-tree-sitter--get-node-bounds-impl
+  (pcase meow-tree-sitter-backend
+    ('treesit #'meow-tree-sitter--get-node-bounds-native)
+    ('tree-sitter #'meow-tree-sitter--get-node-bounds-tsc)))
+
 (defcustom meow-tree-sitter-extra-queries nil
   "Alist of extra queries to use by default.
 Should be an alist mapping language names to a query to use.
@@ -110,8 +135,10 @@ should contain captures for all motions intended to be used (see
 queries in `meow-tree-sitter-queries-dir' for examples)."
   :group 'meow-tree-sitter
   :type '(alist :key-type string
-                :value-type (restricted-sexp
-                             :match-alternatives (treesit-query-p))))
+          :value-type (restricted-sexp
+                       :match-alternatives (pcase meow-tree-sitter-backend
+                                             ('treesit (treesit-query-p))
+                                             ('tree-sitter (tsc-query-p))))))
 
 (defun meow-tree-sitter--get-lang-name (mode)
   "Get the language name for major-mode MODE.
@@ -165,6 +192,26 @@ otherwise return queries from `meow-tree-sitter-queries-dir'."
                 (meow-tree-sitter--get-query lang))
               (string-split langs ",")))))
 
+(defun meow-tree-sitter--get-nodes-tsc (query)
+  "Get nodes matching QUERY using `elisp-tree-sitter'."
+  (tsc-query-captures
+   (tsc-make-query tree-sitter-language query)
+   (tsc-root-node tree-sitter-tree)
+   #'ts--buffer-substring-no-properties))
+
+(defun meow-tree-sitter--get-node-bounds-tsc (node)
+  "Get the bounds of NODE using `elisp-tree-sitter'."
+  (cons (tsc-node-start-byte node)
+        (tsc-node-end-byte node)))
+
+(defun meow-tree-sitter--get-nodes-native (query)
+  "Get nodes matching QUERY using `treesit'."
+  (treesit-query-capture (treesit-buffer-root-node) query))
+
+(defun meow-tree-sitter--get-node-bounds-native (node)
+  "Get the bounds of NODE using `treesit'."
+  (cons (treesit-node-start node) (treesit-node-end node)))
+
 (defun meow-tree-sitter--get-nodes (&optional query)
   "Return tree-sitter nodes for QUERY or the default query.
 If QUERY is non-nil, it should be an alist mapping language names
@@ -176,12 +223,10 @@ CDR is a cons cell of the bounds of the object."
   (let* ((lang (meow-tree-sitter--get-lang-name major-mode))
          (q (or (cdr (assoc lang query))
                 (meow-tree-sitter--get-query lang)))
-         (nodes (treesit-query-capture (treesit-buffer-root-node) q)))
+         (nodes (funcall meow-tree-sitter--get-nodes-impl q)))
     (mapcar (lambda (result)
               (cl-destructuring-bind (name . node) result
-                (cons name
-                      (cons (treesit-node-start node)
-                            (treesit-node-end node)))))
+                (cons name (funcall meow-tree-sitter--get-node-bounds-impl node))))
             nodes)))
 
 (defun meow-tree-sitter--get-nodes-of-type (types &optional query)
