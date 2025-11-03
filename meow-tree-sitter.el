@@ -296,6 +296,35 @@ binds!"
                                                   meow-char-thing-table))
     (meow-tree-sitter-register-thing (car bind) (cdr bind))))
 
+;;;###autoload
+(defun meow-tree-sitter-node ()
+  "Tree-sitter version of `meow-block'.
+Will automatically fall back to `meow-block' if no treesit parser is
+available."
+  (interactive)
+  ;; Using `treesit-parsers-at' theoretically means this also works with local
+  ;; parsers, though I don't know anything in Emacs that uses that, nor how to
+  ;; test it. It always seems to return a list, with `nil' as the only element
+  ;; when treesit isn't present.
+  (if (null (car (treesit-parsers-at)))
+      (call-interactively #'meow-block)
+    (let ((p (point))
+          (m (if (region-active-p) (mark) (point)))
+          (node (treesit-node-at (point))))
+      ;; Expand until the node contains point or mark.
+      (while (not (or (< (treesit-node-start node)
+                         p
+                         (treesit-node-end node))
+                      (< (treesit-node-start node)
+                         m
+                         (treesit-node-end node))))
+        (setq node (treesit-node-parent node)))
+      (thread-first
+        (meow--make-selection '(expand . block)
+                              (treesit-node-start node)
+                              (treesit-node-end node))
+        (meow--select t)))))
+
 (provide 'meow-tree-sitter)
 
 ;;; meow-tree-sitter.el ends here
