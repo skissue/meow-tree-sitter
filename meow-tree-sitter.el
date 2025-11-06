@@ -1,6 +1,6 @@
 ;;; meow-tree-sitter.el --- Tree-sitter powered motions for Meow -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 Ad
+;; Copyright (C) 2025 Ad
 
 ;; Author: Ad <me@skissue.xyz>
 ;; Version: 2.0.2
