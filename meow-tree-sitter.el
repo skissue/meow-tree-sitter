@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024 Ad
 
 ;; Author: Ad <me@skissue.xyz>
-;; Version: 2.0.1
+;; Version: 2.0.2
 ;; Package-Requires: ((emacs "29.1") (meow "1.2.0"))
 ;; URL: https://github.com/skissue/meow-tree-sitter
 ;; Keywords: convenience, files, languages, tools
