@@ -45,6 +45,13 @@ Alternatively, you can install the package manually as usual: clone the reposito
 
 Tree-sitter powered motions should now be accessible through Meow's "thing" functionality, namely ~meow-bounds-of-thing~ and ~meow-inner-of-thing~ (bound to period and comma by default).
 
+Additionally, ~meow-tree-sitter-node~ provides a tree-sitter powered drop-in replacement for ~meow-block~. It will automatically fallback in non-tree-sitter buffers, and works with any major mode without the need for queries (since it simply parses node boundaries) ⚡.
+
+#+begin_src elisp
+  (meow-normal-define-key
+    '("o" . meow-tree-sitter-node))
+#+end_src
+
 * Configuration 🔧
 ~meow-tree-sitter-register-defaults~ is the easiest way to get started, and will set up the default keybinds. Currently, this adds the following keys to Meow's "things":
 + a :: class
