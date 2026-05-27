@@ -58,7 +58,7 @@
  ; the test function
  (function_item
    body: (_) @test.inside) @test.around
- (#eq? @_test_attribute "test"))
+ (#equal @_test_attribute "test"))
 
 (array_expression
   (_) @entry.around)
@@ -72,7 +72,7 @@
 ; Commonly used vec macro intializer is special cased
 (macro_invocation
   (identifier) @_id (token_tree (_) @entry.around)
-  (#eq? @_id "vec"))
+  (#equal @_id "vec"))
 
 (enum_variant) @entry.around
 
